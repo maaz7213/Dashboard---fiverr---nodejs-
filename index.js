@@ -7,25 +7,27 @@ const app = express();
 
 // Use CORS middleware
 // Middleware to parse JSON request bodies
-app.use(cors({
-  origin: 'https://dashboard-fiverr-nodejs.vercel.app', // Frontend URL
+const FRONTEND_ORIGIN = 'https://dashboard-fiverr-nodejs.vercel.app';
+
+// CORS Configuration
+const corsOptions = {
+  origin: FRONTEND_ORIGIN,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true,  // Allow cookies/credentials
-  allowedHeaders: ['Content-Type', 'Authorization'] // Adjust headers as needed
-}));
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
 
 // Middleware to parse JSON and URL-encoded data
-app.use(express.json());  // For parsing application/json
-app.use(express.urlencoded({ extended: true }));  // For parsing application/x-www-form-urlencoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Optional: If you want to explicitly handle OPTIONS requests (although cors middleware already does this)
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', 'https://dashboard-fiverr-nodejs.vercel.app');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.sendStatus(200);  // Respond OK for preflight requests
-});  // For parsing application/x-www-form-urlencoded
+// Optional: Log incoming request origins
+app.use((req, res, next) => {
+  console.log('Request Origin:', req.headers.origin);
+  next();
+}); // For parsing application/x-www-form-urlencoded
 
 const mongoURI = 'mongodb+srv://shiwanshaggarwal2004:YPvS4SDJwKc59iUv@cluster0.ueomq.mongodb.net/';
 const dbName = 'test';
@@ -83,7 +85,7 @@ app.post('/login', async (req, res) => {
       }
 
       // Explicitly send a JSON response with status 201
-      return res.status(201).json({ message: 'Login successful', user });
+      return res.status(200).json({ message: 'Login successful', user });
   } catch (error) {
       return res.status(500).json({ message: 'Error logging in', error });
   } finally {
