@@ -7,28 +7,28 @@ const app = express();
 
 // Use CORS middleware
 // Middleware to parse JSON request bodies
-const FRONTEND_ORIGIN = 'https://dashboard-fiverr-nodejs.vercel.app';
+// const FRONTEND_ORIGIN = 'https://dashboard-fiverr-nodejs.vercel.app';
 
-// CORS Configuration
-const corsOptions = {
-  origin: FRONTEND_ORIGIN,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 204
-};
+// // CORS Configuration
+// const corsOptions = {
+//   origin: FRONTEND_ORIGIN,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   credentials: true,
+//   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Authorization'],
+//   optionsSuccessStatus: 204,
+//   preflightContinue: false,
+// };
 
 app.use(cors(corsOptions));
-app.use(cors());
-// Middleware to parse JSON and URL-encoded data
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: "https://dashboard-fiverr-nodejs.vercel.app",
+  })
+);
 
-// Optional: Log incoming request origins
-app.use((req, res, next) => {
-  console.log('Request Origin:', req.headers.origin);
-  next();
-}); // For parsing application/x-www-form-urlencoded
+app.use(express.json());
+app.options('*', cors());
+
 
 const mongoURI = 'mongodb+srv://shiwanshaggarwal2004:YPvS4SDJwKc59iUv@cluster0.ueomq.mongodb.net/';
 const dbName = 'test';
