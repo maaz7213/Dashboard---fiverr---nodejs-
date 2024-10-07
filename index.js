@@ -7,14 +7,25 @@ const app = express();
 
 // Use CORS middleware
 // Middleware to parse JSON request bodies
-app.options('*', cors()); 
 app.use(cors({
-  origin: ['https://dashboard-fiverr-nodejs.vercel.app/'], // Replace with your frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+  origin: 'https://dashboard-fiverr-nodejs.vercel.app', // Frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,  // Allow cookies/credentials
+  allowedHeaders: ['Content-Type', 'Authorization'] // Adjust headers as needed
 }));
+
+// Middleware to parse JSON and URL-encoded data
 app.use(express.json());  // For parsing application/json
 app.use(express.urlencoded({ extended: true }));  // For parsing application/x-www-form-urlencoded
+
+// Optional: If you want to explicitly handle OPTIONS requests (although cors middleware already does this)
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', 'https://dashboard-fiverr-nodejs.vercel.app');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.sendStatus(200);  // Respond OK for preflight requests
+});  // For parsing application/x-www-form-urlencoded
 
 const mongoURI = 'mongodb+srv://shiwanshaggarwal2004:YPvS4SDJwKc59iUv@cluster0.ueomq.mongodb.net/';
 const dbName = 'test';
