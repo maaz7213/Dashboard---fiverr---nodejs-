@@ -453,13 +453,7 @@ app.post('/add_operator', async (req, res) => {
     } 
   })
 // Serve the static React app (if you are serving React from the same server)
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, 'client/build')));
 
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-    });
-}
 
 // Start the server on the specified port
 const PORT = process.env.PORT || 3000;
