@@ -70,9 +70,9 @@ app.post('/login', async (req, res) => {
             return res.status(400).json({ message: 'Invalid email or password.' });
         }
 
-        res.json({ message: 'Login successful',user:user });
+       return res.json({ message: 'Login successful',user:user });
     } catch (error) {
-        res.status(500).json({ message: 'Error logging in', error });
+      return  res.status(500).json({ message: 'Error logging in', error });
     } finally {
         await client.close();
     }
@@ -108,10 +108,10 @@ app.post('/signup', async (req, res) => {
 
         await usersCollection.insertOne(newUser);
 
-        res.status(201).json({ message: 'User registered successfully!' });
+        return  res.status(201).json({ message: 'User registered successfully!' });
     } catch (error) {
         console.log(': ' + error.message);
-        res.status(500).json({ message: 'Error registering user', error });
+        return  res.status(500).json({ message: 'Error registering user', error });
     } finally {
         await client.close();
     }
@@ -129,10 +129,10 @@ app.get('/ONOff', async (req, res) => {
         const data = await collection.find().toArray();
 
         // Respond with the data (not the MongoClient object)
-        res.json({ data });
+        return res.json({ data });
     } catch (err) {
         console.error('Error:', err);
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 });
 
@@ -144,10 +144,10 @@ app.get('/machine_threshold/:deviceNo', async (req, res) => {
 
     try {
         const data = await fetchDataByDevice('machine_threshold', deviceNo);
-        res.json({ message: data });
+        return res.json({ message: data });
     } catch (err) {
         console.error('Error:', err);
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
 });
 
@@ -161,10 +161,10 @@ app.get('/machine_threshold', async (req, res) => {
 
         // Assuming "deviceId" is the field that stores the device ID
         const uniqueDeviceIds = await collection.distinct('deviceno');
-        res.json({ uniqueDeviceIds });
+        return res.json({ uniqueDeviceIds });
     } catch (err) {
         console.error('Error:', err);
-        res.status(500).json({ message: err.message });
+        return  res.status(500).json({ message: err.message });
     } finally {
         await client.close();  // Ensure the client is closed
     }
@@ -183,10 +183,10 @@ app.get('/shiftwise/:deviceNo', async (req, res) => {
         const collection = db.collection("shiftwise_data");
         const data =  await collection.find({ "_id.deviceno": parseInt(deviceNo) }).toArray();
         ;
-        res.json({ message: data });
+        return res.json({ message: data });
     } catch (err) {
         console.error('Error:', err);
-        res.status(500).json({ message: err.message });
+        return   res.status(500).json({ message: err.message });
     }
 });
 
@@ -201,10 +201,10 @@ app.get('/shiftwise', async (req, res) => {
       const collection = db.collection("shiftwise_data");
       const data =  await collection.find().toArray();
      
-      res.json({ message: data });
+      return res.json({ message: data });
   } catch (err) {
       console.error('Error:', err);
-      res.status(500).json({ message: err.message });
+      return  res.status(500).json({ message: err.message });
   }
 });
 
@@ -228,10 +228,10 @@ app.post('/add_operator', async (req, res) => {
       const result = await collection.insertOne({ name, userID });
   
       // Respond with success
-      res.status(201).json({ message: 'Operator added successfully', operatorId: result.insertedId });
+      return res.status(201).json({ message: 'Operator added successfully', operatorId: result.insertedId });
     } catch (err) {
       console.error('Error adding operator:', err);
-      res.status(500).json({ message: 'Internal server error', error: err.message });
+      return  res.status(500).json({ message: 'Internal server error', error: err.message });
     } 
   });
 
@@ -254,7 +254,7 @@ app.post('/add_operator', async (req, res) => {
       const operators = await collection.find({ userID }).toArray();
   
       // Respond with the list of operators
-      res.status(200).json({ operators });
+      return res.status(200).json({ operators });
     } catch (err) {
       console.error('Error fetching operators:', err);
       res.status(500).json({ message: 'Internal server error', error: err.message });
@@ -294,7 +294,7 @@ app.post('/add_operator', async (req, res) => {
             $set: { deviceno, channel, date, shift, operatorId }, // Fields to update
           }
         );
-        res.status(200).json({ message: 'Operator selection updated successfully.', updatedSelection });
+        return  res.status(200).json({ message: 'Operator selection updated successfully.', updatedSelection });
       } else {
         // If it doesn't exist, create a new document
         const newSelection = {
@@ -306,11 +306,11 @@ app.post('/add_operator', async (req, res) => {
           operatorId,
         };
         await collection.insertOne(newSelection);
-        res.status(201).json({ message: 'Operator selection saved successfully.', newSelection });
+        return res.status(201).json({ message: 'Operator selection saved successfully.', newSelection });
       }
     } catch (error) {
       console.error('Error saving operator selection:', error);
-      res.status(500).json({ message: 'Error saving operator selection.', error: error.message });
+      return res.status(500).json({ message: 'Error saving operator selection.', error: error.message });
     } finally {
       await client.close();
     }
@@ -329,10 +329,10 @@ app.post('/add_operator', async (req, res) => {
       // Fetch all documents from the collection
       const data = await collection.find().toArray();
   
-      res.status(200).json({ data });
+      return res.status(200).json({ data });
     } catch (error) {
       console.error('Error fetching data: ' + error.message);
-      res.status(500).json({ message: 'Error fetching data', error: error.message });
+      return res.status(500).json({ message: 'Error fetching data', error: error.message });
     } 
   });
  
@@ -356,10 +356,10 @@ app.post('/add_operator', async (req, res) => {
       const result = await collection.insertOne({ reason, userID ,additionalDetails});
   
       // Respond with success
-      res.status(201).json({ message: 'Operator added successfully', operatorId: result.insertedId });
+      return res.status(201).json({ message: 'Operator added successfully', operatorId: result.insertedId });
     } catch (err) {
       console.error('Error adding operator:', err);
-      res.status(500).json({ message: 'Internal server error', error: err.message });
+      return res.status(500).json({ message: 'Internal server error', error: err.message });
     } 
   });
 
@@ -387,10 +387,10 @@ app.post('/add_operator', async (req, res) => {
           reason: item.reason,
         }))
       );
-      res.status(200).json({ message: 'Reasons saved successfully' });
+      return res.status(200).json({ message: 'Reasons saved successfully' });
     } catch (error) {
       console.error('Error saving reasons:', error);
-      res.status(500).json({ message: 'Internal Server Error' });
+      return res.status(500).json({ message: 'Internal Server Error' });
     }
   });
 
@@ -407,10 +407,10 @@ app.post('/add_operator', async (req, res) => {
       // Fetch all documents from the collection
       const data = await collection.find({userID:userID}).toArray();
   
-      res.status(200).json({ data });
+      return res.status(200).json({ data });
     } catch (error) {
       console.error('Error fetching data: ' + error.message);
-      res.status(500).json({ message: 'Error fetching data', error: error.message });
+      return res.status(500).json({ message: 'Error fetching data', error: error.message });
     } 
   })
 
@@ -426,10 +426,10 @@ app.post('/add_operator', async (req, res) => {
       // Fetch all documents from the collection
       const data = await collection.find({}).toArray();
   
-      res.status(200).json({ data });
+      return res.status(200).json({ data });
     } catch (error) {
       console.error('Error fetching data: ' + error.message);
-      res.status(500).json({ message: 'Error fetching data', error: error.message });
+      return res.status(500).json({ message: 'Error fetching data', error: error.message });
     } 
   })
 
@@ -446,10 +446,10 @@ app.post('/add_operator', async (req, res) => {
       // Fetch all documents from the collection
       const data = await collection.find({}).toArray();
   
-      res.status(200).json({ data });
+      return res.status(200).json({ data });
     } catch (error) {
       console.error('Error fetching data: ' + error.message);
-      res.status(500).json({ message: 'Error fetching data', error: error.message });
+      return  res.status(500).json({ message: 'Error fetching data', error: error.message });
     } 
   })
 // Serve the static React app (if you are serving React from the same server)
