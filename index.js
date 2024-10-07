@@ -6,13 +6,14 @@ const bcrypt = require('bcryptjs');
 const app = express();
 
 // Use CORS middleware
-app.use(cors());
-app.use(express.json());  // Middleware to parse JSON request bodies
+// Middleware to parse JSON request bodies
 app.use(cors({
   origin: ['https://dashboard-fiverr-nodejs-18f69qumq-maaz7213s-projects.vercel.app'], // Replace with your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
+app.use(express.json());  // For parsing application/json
+app.use(express.urlencoded({ extended: true }));  // For parsing application/x-www-form-urlencoded
 
 const mongoURI = 'mongodb+srv://shiwanshaggarwal2004:YPvS4SDJwKc59iUv@cluster0.ueomq.mongodb.net/';
 const dbName = 'test';
