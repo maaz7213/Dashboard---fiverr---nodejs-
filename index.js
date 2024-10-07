@@ -19,7 +19,6 @@ const app = express();
 //   preflightContinue: false,
 // };
 
-app.use(cors(corsOptions));
 app.use(
   cors({
     origin: "https://dashboard-fiverr-nodejs.vercel.app",
