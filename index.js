@@ -8,7 +8,7 @@ const app = express();
 // Use CORS middleware
 // Middleware to parse JSON request bodies
 app.use(cors({
-  origin: ['https://dashboard-fiverr-nodejs-18f69qumq-maaz7213s-projects.vercel.app'], // Replace with your frontend URL
+  origin: ['https://dashboard-fiverr-nodejs-18f69qumq-maaz7213s-projects.vercel.app/'], // Replace with your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
