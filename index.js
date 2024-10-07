@@ -47,75 +47,78 @@ app.get('/', (req, res) => {
 
 // Login API (same as before)
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required.' });
-    }
+  if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required.' });
+  }
 
-    const client = new MongoClient(mongoURI);
+  const client = new MongoClient(mongoURI);
 
-    try {
-        await client.connect();
-        const db = client.db(dbName);
-        const usersCollection = db.collection('users');
+  try {
+      await client.connect();
+      const db = client.db(dbName);
+      const usersCollection = db.collection('users');
 
-        const user = await usersCollection.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: 'Invalid email or password.' });
-        }
+      const user = await usersCollection.findOne({ email });
+      if (!user) {
+          return res.status(400).json({ message: 'Invalid email or password.' });
+      }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid email or password.' });
-        }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+          return res.status(400).json({ message: 'Invalid email or password.' });
+      }
 
-       return res.json({ message: 'Login successful',user:user });
-    } catch (error) {
-      return  res.status(500).json({ message: 'Error logging in', error });
-    } finally {
-        await client.close();
-    }
+      // Explicitly send a JSON response with status 201
+      return res.status(201).json({ message: 'Login successful', user });
+  } catch (error) {
+      return res.status(500).json({ message: 'Error logging in', error });
+  } finally {
+      await client.close();
+  }
 });
+
 
 // Signup API (same as before)
 app.post('/signup', async (req, res) => {
-    const { username, email, password } = req.body;
+  const { username, email, password } = req.body;
 
-    if (!username || !email || !password) {
-        return res.status(400).json({ message: 'All fields are required.' });
-    }
+  if (!username || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required.' });
+  }
 
-    const client = new MongoClient(mongoURI);
+  const client = new MongoClient(mongoURI);
 
-    try {
-        await client.connect();
-        const db = client.db(dbName);
-        const usersCollection = db.collection('users');
+  try {
+      await client.connect();
+      const db = client.db(dbName);
+      const usersCollection = db.collection('users');
 
-        const existingUser = await usersCollection.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: 'Email already exists.' });
-        }
+      const existingUser = await usersCollection.findOne({ email });
+      if (existingUser) {
+          return res.status(400).json({ message: 'Email already exists.' });
+      }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = {
-            username,
-            email,
-            password: hashedPassword
-        };
+      const newUser = {
+          username,
+          email,
+          password: hashedPassword
+      };
 
-        await usersCollection.insertOne(newUser);
+      await usersCollection.insertOne(newUser);
 
-        return  res.status(201).json({ message: 'User registered successfully!' });
-    } catch (error) {
-        console.log(': ' + error.message);
-        return  res.status(500).json({ message: 'Error registering user', error });
-    } finally {
-        await client.close();
-    }
+      // Explicitly send a JSON response with status 201
+      return res.status(201).json({ message: 'User registered successfully!' });
+  } catch (error) {
+      return res.status(500).json({ message: 'Error registering user', error });
+  } finally {
+      await client.close();
+  }
 });
+
 
 // Fetch data from the "ON_OFF_data" collection based on deviceNo
 app.get('/ONOff', async (req, res) => {
@@ -210,30 +213,30 @@ app.get('/shiftwise', async (req, res) => {
 
 
 app.post('/add_operator', async (req, res) => {
-    try {
-      const client = new MongoClient(mongoURI, { connectTimeoutMS: 30000 });
+  const { name, userID } = req.body;
+
+  if (!name || !userID) {
+      return res.status(400).json({ message: 'Operator name and userID are required.' });
+  }
+
+  const client = new MongoClient(mongoURI);
+
+  try {
       await client.connect();
       const db = client.db(dbName);
       const collection = db.collection('operators');
-  
-      // Get the operator data and userID from the request body
-      const { name, userID } = req.body;
-  
-      // Validate that both name and userID are provided
-      if (!name || !userID) {
-        return res.status(400).json({ message: 'Operator name and userID are required.' });
-      }
-  
-      // Insert the new operator into the collection with the userID
+
       const result = await collection.insertOne({ name, userID });
-  
-      // Respond with success
+
+      // Explicitly send a JSON response with status 201
       return res.status(201).json({ message: 'Operator added successfully', operatorId: result.insertedId });
-    } catch (err) {
-      console.error('Error adding operator:', err);
-      return  res.status(500).json({ message: 'Internal server error', error: err.message });
-    } 
-  });
+  } catch (err) {
+      return res.status(500).json({ message: 'Internal server error', error: err.message });
+  } finally {
+      await client.close();
+  }
+});
+
 
   app.get('/get_operators_by_userid/:userID', async (req, res) => {
     try {
