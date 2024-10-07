@@ -19,11 +19,11 @@ const app = express();
 //   preflightContinue: false,
 // };
 
-app.use(
-  cors({
-    origin: "https://dashboard-fiverr-nodejs.vercel.app",
-  })
-);
+app.use(cors({
+  origin: 'https://dashboard-fiverr.vercel.app', // Allow this origin
+  methods: ['GET', 'POST'], // Specify allowed methods
+  credentials: true, // If cookies or auth headers are being sent
+}));
 
 app.use(express.json());
 app.options('*', cors());
