@@ -515,11 +515,16 @@ app.put('/reasons/:id', async (req, res) => {
     await client.connect();
     const db = client.db(dbName);
     const collection = db.collection('Reasons');
+
+    console.log("Updating reason:", { id: objectId, reason, additionalDetails });
+
     // Update the reason in the database
     const result = await collection.updateOne(
       { _id: objectId }, // Find the document with the given ID
       { $set: { reason, additionalDetails } } // Set the new values
     );
+
+    console.log("Update result:", result);
 
     // Check if any document was updated
     if (result.modifiedCount === 0) {
@@ -530,6 +535,8 @@ app.put('/reasons/:id', async (req, res) => {
   } catch (error) {
     console.error('Error updating reason:', error);
     return res.status(500).json({ message: 'Failed to update reason.' });
+  } finally {
+    await client.close(); // Make sure to close the client connection
   }
 });
 
