@@ -534,7 +534,7 @@ app.put('/reasons/:id', async (req, res) => {
     return res.status(200).json({ message: 'Reason updated successfully.' });
   } catch (error) {
     console.error('Error updating reason:', error);
-    return res.status(500).json({ message: 'Failed to update reason.' });
+    return res.status(500).json({ message: error });
   } finally {
     await client.close(); // Make sure to close the client connection
   }
