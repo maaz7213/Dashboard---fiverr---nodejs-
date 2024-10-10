@@ -470,7 +470,34 @@ app.post('/add_operator', async (req, res) => {
     } 
   })
 // Serve the static React app (if you are serving React from the same server)
+app.delete('/reasons/:id', async (req, res) => {
+  const reasonId = req.params.id; // Get the reason ID from the request params
 
+  const client = new MongoClient(mongoURI, { connectTimeoutMS: 30000 });
+
+  try {
+    // Connect to the MongoDB client
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection('Reasons');
+
+    // Try to find and delete the reason with the given ID
+    const result = await collection.deleteOne({ _id: new ObjectId(reasonId) });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: 'Reason not found.' });
+    }
+
+    res.status(200).json({ message: 'Reason deleted successfully.' });
+
+  } catch (error) {
+    console.error('Error deleting reason:', error);
+    res.status(500).json({ message: 'Failed to delete the reason.', error: error.message });
+  } finally {
+    // Ensure client is closed even if there’s an error
+    await client.close();
+  }
+});
 
 // Start the server on the specified port
 const PORT = process.env.PORT || 3000;
