@@ -4,7 +4,7 @@ const { MongoClient } = require('mongodb');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const app = express();
-
+const { ObjectId } = require('mongodb'); 
 // Use CORS middleware
 // Middleware to parse JSON request bodies
 // const FRONTEND_ORIGIN = 'https://dashboard-fiverr-nodejs.vercel.app';
@@ -480,10 +480,9 @@ console.log(reasonId);
     await client.connect();
     const db = client.db(dbName);
     const collection = db.collection('Reasons');
-
+    const objectId = new ObjectId(reasonId);
     // Try to find and delete the reason with the given ID
-    const result = await collection.findById(reasonId);
-      
+      const result = await collection.deleteOne({ _id: objectId });
       if (result.deletedCount === 0) {
         return res.status(404).json({ message: 'Reason not found.' });
       }
