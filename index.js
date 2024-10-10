@@ -354,6 +354,35 @@ app.post('/add_operator', async (req, res) => {
   });
  
 
+  app.delete('/delete_operator/:id', async (req, res) => {
+    const reasonId = req.params.id; // Get the reason ID from the request params
+  console.log(reasonId);
+    const client = new MongoClient(mongoURI, { connectTimeoutMS: 30000 });
+  
+    try {
+      // Connect to the MongoDB client
+      await client.connect();
+      const db = client.db(dbName);
+      const collection = db.collection('operators');
+      const objectId = new ObjectId(reasonId);
+      // Try to find and delete the reason with the given ID
+        const result = await collection.deleteOne({ _id: objectId });
+        if (result.deletedCount === 0) {
+          return res.status(404).json({ message: 'delete_operator not found.' });
+        }
+  
+      res.status(200).json({ message: 'delete_operator deleted successfully.' });
+  
+    } catch (error) {
+      console.error('Error deleting reason:', error);
+      res.status(500).json({ message: 'Failed to delete the reason.', error: error.message });
+    } finally {
+      // Ensure client is closed even if there’s an error
+      await client.close();
+    }
+  });
+
+
   app.post('/reasons', async (req, res) => {
     try {
       const client = new MongoClient(mongoURI, { connectTimeoutMS: 30000 });
