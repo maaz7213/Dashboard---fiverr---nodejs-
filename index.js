@@ -502,7 +502,7 @@ console.log(reasonId);
 app.put('/reasons/:id', async (req, res) => {
   const reasonId = req.params.id; // Get the reason ID from the request parameters
   const { reason, additionalDetails } = req.body; // Get the new values from the request body
-
+  const client = new MongoClient(mongoURI, { connectTimeoutMS: 30000 });
   // Log the incoming request data for debugging
   console.log('Updating reason with ID:', reasonId);
   console.log('Payload:', req.body);
