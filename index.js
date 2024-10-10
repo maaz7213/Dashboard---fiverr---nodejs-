@@ -382,6 +382,55 @@ app.post('/add_operator', async (req, res) => {
     }
   });
 
+  app.put('/edit_operator/:id', async (req, res) => {
+    const reasonId = req.params.id; // Get the reason ID from the request parameters
+    const { name } = req.body; // Get the new values from the request body
+    const client = new MongoClient(mongoURI, { connectTimeoutMS: 30000 });
+    // Log the incoming request data for debugging
+    console.log('Updating reason with ID:', reasonId);
+    console.log('Payload:', req.body);
+  
+    // Ensure the ID is valid
+    if (!ObjectId.isValid(reasonId)) {
+      return res.status(400).json({ message: 'Invalid ID format.' });
+    }
+  
+    // Convert the reasonId to ObjectId
+    const objectId = new ObjectId(reasonId);
+  
+    try {
+      await client.connect();
+      const db = client.db(dbName);
+      const collection = db.collection('operators');
+  
+      // Check if the reason exists before updating
+      const existingReason = await collection.findOne({ _id: objectId });
+      if (!existingReason) {
+        return res.status(404).json({ message: 'Reason not found.' });
+      }
+  
+      // Update the reason in the database
+      const result = await collection.updateOne(
+        { _id: objectId }, // Find the document with the given ID
+        { $set: {name : name } } // Set the new values
+      );
+  
+      // Log the result of the update operation
+      console.log('Update Result:', result);
+  
+      // Check if any document was updated
+      if (result.modifiedCount === 0) {
+        return res.status(400).json({ message: 'No changes made.' });
+      }
+  
+      return res.status(200).json({ message: 'Reason updated successfully.' });
+    } catch (error) {
+      console.error('Error updating reason:', error.message || error);
+      return res.status(500).json({ message: 'Failed to update reason.', error: error.message || error });
+    } finally {
+      await client.close(); // Make sure to close the client connection
+    }
+  });
 
   app.post('/reasons', async (req, res) => {
     try {
