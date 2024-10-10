@@ -503,6 +503,10 @@ app.put('/reasons/:id', async (req, res) => {
   const reasonId = req.params.id; // Get the reason ID from the request parameters
   const { reason, additionalDetails } = req.body; // Get the new values from the request body
 
+  // Log the incoming request data for debugging
+  console.log('Updating reason with ID:', reasonId);
+  console.log('Payload:', req.body);
+
   // Ensure the ID is valid
   if (!ObjectId.isValid(reasonId)) {
     return res.status(400).json({ message: 'Invalid ID format.' });
@@ -528,6 +532,9 @@ app.put('/reasons/:id', async (req, res) => {
       { $set: { reason, additionalDetails } } // Set the new values
     );
 
+    // Log the result of the update operation
+    console.log('Update Result:', result);
+
     // Check if any document was updated
     if (result.modifiedCount === 0) {
       return res.status(400).json({ message: 'No changes made.' });
@@ -535,12 +542,13 @@ app.put('/reasons/:id', async (req, res) => {
 
     return res.status(200).json({ message: 'Reason updated successfully.' });
   } catch (error) {
-    console.error('Error updating reason:', error);
-    return res.status(500).json({ message: 'Failed to update reason.' ,error});
+    console.error('Error updating reason:', error.message || error);
+    return res.status(500).json({ message: 'Failed to update reason.', error: error.message || error });
   } finally {
     await client.close(); // Make sure to close the client connection
   }
 });
+
 
 
 // Start the server on the specified port
