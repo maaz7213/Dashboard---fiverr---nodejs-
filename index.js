@@ -482,7 +482,7 @@ console.log(reasonId);
     const collection = db.collection('Reasons');
 
     // Try to find and delete the reason with the given ID
-    const result = await collection.findByIdAndDelete(reasonId);
+    const result = await collection.findById(reasonId);
       
       if (result.deletedCount === 0) {
         return res.status(404).json({ message: 'Reason not found.' });
