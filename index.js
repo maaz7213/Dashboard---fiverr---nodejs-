@@ -470,7 +470,7 @@ app.post('/add_operator', async (req, res) => {
     } 
   })
 // Serve the static React app (if you are serving React from the same server)
-app.delete('/reasons/:id', async (req, res) => {
+app.delete('/deletereasons/:id', async (req, res) => {
   const reasonId = req.params.id; // Get the reason ID from the request params
 console.log(reasonId);
   const client = new MongoClient(mongoURI, { connectTimeoutMS: 30000 });
