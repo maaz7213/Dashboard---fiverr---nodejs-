@@ -516,7 +516,11 @@ app.put('/reasons/:id', async (req, res) => {
     const db = client.db(dbName);
     const collection = db.collection('Reasons');
 
-    console.log("Updating reason:", { id: objectId, reason, additionalDetails });
+    // Check if the reason exists before updating
+    const existingReason = await collection.findOne({ _id: objectId });
+    if (!existingReason) {
+      return res.status(404).json({ message: 'Reason not found.' });
+    }
 
     // Update the reason in the database
     const result = await collection.updateOne(
@@ -524,22 +528,19 @@ app.put('/reasons/:id', async (req, res) => {
       { $set: { reason, additionalDetails } } // Set the new values
     );
 
-    console.log("Update result:", result);
-
     // Check if any document was updated
     if (result.modifiedCount === 0) {
-      return res.status(404).json({ message: 'Reason not found or no changes made.' });
+      return res.status(400).json({ message: 'No changes made.' });
     }
 
     return res.status(200).json({ message: 'Reason updated successfully.' });
   } catch (error) {
     console.error('Error updating reason:', error);
-    return res.status(500).json({ message: error });
+    return res.status(500).json({ message: 'Failed to update reason.' ,error});
   } finally {
     await client.close(); // Make sure to close the client connection
   }
 });
-
 
 
 // Start the server on the specified port
