@@ -21,7 +21,7 @@ const app = express();
 
 app.use(cors({
   origin: 'https://dashboard-fiverr.vercel.app', // Allow this origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],// Specify allowed methods
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
   credentials: true, // If cookies or auth headers are being sent
 }));
 
@@ -470,7 +470,7 @@ app.post('/add_operator', async (req, res) => {
     } 
   })
 // Serve the static React app (if you are serving React from the same server)
-app.delete('/deletereasons/:id', async (req, res) => {
+app.delete('/reasons/:id', async (req, res) => {
   const reasonId = req.params.id; // Get the reason ID from the request params
 console.log(reasonId);
   const client = new MongoClient(mongoURI, { connectTimeoutMS: 30000 });
@@ -482,8 +482,8 @@ console.log(reasonId);
     const collection = db.collection('Reasons');
 
     // Try to find and delete the reason with the given ID
-    const result = await collection.findOneAndDelete({ _id: reasonId });
-    console.log(result);
+    const result = await collection.deleteOne({ _id: new ObjectId(reasonId) });
+    
     if (result.deletedCount === 0) {
       return res.status(404).json({ message: 'Reason not found.' });
     }
