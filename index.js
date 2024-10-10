@@ -21,7 +21,7 @@ const app = express();
 
 app.use(cors({
   origin: 'https://dashboard-fiverr.vercel.app', // Allow this origin
-  methods: ['GET', 'POST'], // Specify allowed methods
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],// Specify allowed methods
   credentials: true, // If cookies or auth headers are being sent
 }));
 
