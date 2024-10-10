@@ -498,6 +498,43 @@ console.log(reasonId);
   }
 });
 
+// Assuming you have Express set up
+app.put('/reasons/:id', async (req, res) => {
+  const reasonId = req.params.id; // Get the reason ID from the request parameters
+  const { reason, additionalDetails } = req.body; // Get the new values from the request body
+
+  // Ensure the ID is valid
+  if (!ObjectId.isValid(reasonId)) {
+    return res.status(400).json({ message: 'Invalid ID format.' });
+  }
+
+  // Convert the reasonId to ObjectId
+  const objectId = new ObjectId(reasonId);
+
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection('Reasons');
+    // Update the reason in the database
+    const result = await collection.updateOne(
+      { _id: objectId }, // Find the document with the given ID
+      { $set: { reason, additionalDetails } } // Set the new values
+    );
+
+    // Check if any document was updated
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: 'Reason not found or no changes made.' });
+    }
+
+    return res.status(200).json({ message: 'Reason updated successfully.' });
+  } catch (error) {
+    console.error('Error updating reason:', error);
+    return res.status(500).json({ message: 'Failed to update reason.' });
+  }
+});
+
+
+
 // Start the server on the specified port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
