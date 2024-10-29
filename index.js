@@ -5,22 +5,10 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const app = express();
 const { ObjectId } = require('mongodb'); 
-// Use CORS middleware
-// Middleware to parse JSON request bodies
-// const FRONTEND_ORIGIN = 'https://dashboard-fiverr-nodejs.vercel.app';
 
-// // CORS Configuration
-// const corsOptions = {
-//   origin: FRONTEND_ORIGIN,
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//   credentials: true,
-//   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Authorization'],
-//   optionsSuccessStatus: 204,
-//   preflightContinue: false,
-// };
 
 app.use(cors({
-  origin: 'https://dashboard-fiverr.vercel.app', // Allow this origin
+  origin: '*', // Allow this origin
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
   credentials: true, // If cookies or auth headers are being sent
 }));
