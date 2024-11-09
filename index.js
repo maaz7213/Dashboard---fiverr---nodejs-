@@ -268,6 +268,59 @@ app.post('/add_operator', async (req, res) => {
   
 
   // POST /save_operator_selection endpoint
+  // app.post('/save_operator_selection', async (req, res) => {
+  //   // Extract data from request body
+  //   const { deviceno, channel, date, shift, operatorId } = req.body;
+  
+  //   // Validate required fields
+  //   if (!deviceno || !channel || !date || !shift || !operatorId) {
+  //     return res.status(400).json({ message: 'Missing required fields.' });
+  //   }
+  
+  //   const client = new MongoClient(mongoURI, { connectTimeoutMS: 30000 });
+  
+  //   try {
+  //     // Connect to MongoDB
+  //     await client.connect();
+  //     const db = client.db(dbName);
+  //     const collection = db.collection('save_operator_selection');
+  
+  //     // Generate a unique _id using composite fields
+  //     const _id = `${deviceno}_${channel}_${shift}_${date}`;
+  
+  //     // Check if a document with the same _id already exists
+  //     const existingSelection = await collection.findOne({ _id });
+  
+  //     if (existingSelection) {
+  //       // If it exists, update the document
+  //       const updatedSelection = await collection.updateOne(
+  //         { _id }, // Filter to find the document
+  //         {
+  //           $set: { deviceno, channel, date, shift, operatorId }, // Fields to update
+  //         }
+  //       );
+  //       return  res.status(200).json({ message: 'Operator selection updated successfully.', updatedSelection });
+  //     } else {
+  //       // If it doesn't exist, create a new document
+  //       const newSelection = {
+  //         _id,
+  //         deviceno,
+  //         channel,
+  //         date,
+  //         shift,
+  //         operatorId,
+  //       };
+  //       await collection.insertOne(newSelection);
+  //       return res.status(201).json({ message: 'Operator selection saved successfully.', newSelection });
+  //     }
+  //   } catch (error) {
+  //     console.error('Error saving operator selection:', error);
+  //     return res.status(500).json({ message: 'Error saving operator selection.', error: error.message });
+  //   } finally {
+  //     await client.close();
+  //   }
+  // });
+  
   app.post('/save_operator_selection', async (req, res) => {
     // Extract data from request body
     const { deviceno, channel, date, shift, operatorId } = req.body;
@@ -288,32 +341,25 @@ app.post('/add_operator', async (req, res) => {
       // Generate a unique _id using composite fields
       const _id = `${deviceno}_${channel}_${shift}_${date}`;
   
-      // Check if a document with the same _id already exists
-      const existingSelection = await collection.findOne({ _id });
+      // Attempt to update if document already exists, else insert a new document
+      const updateResult = await collection.updateOne(
+        { _id },
+        {
+          $set: { deviceno, channel, date, shift, operatorId },
+        },
+        { upsert: true } // This option inserts if document does not exist
+      );
   
-      if (existingSelection) {
-        // If it exists, update the document
-        const updatedSelection = await collection.updateOne(
-          { _id }, // Filter to find the document
-          {
-            $set: { deviceno, channel, date, shift, operatorId }, // Fields to update
-          }
-        );
-        return  res.status(200).json({ message: 'Operator selection updated successfully.', updatedSelection });
+      if (updateResult.matchedCount > 0) {
+        return res.status(200).json({ message: 'Operator selection updated successfully.' });
       } else {
-        // If it doesn't exist, create a new document
-        const newSelection = {
-          _id,
-          deviceno,
-          channel,
-          date,
-          shift,
-          operatorId,
-        };
-        await collection.insertOne(newSelection);
-        return res.status(201).json({ message: 'Operator selection saved successfully.', newSelection });
+        return res.status(201).json({ message: 'Operator selection saved successfully.' });
       }
     } catch (error) {
+      if (error.code === 11000) {
+        // Handle duplicate key error specifically
+        return res.status(409).json({ message: 'Duplicate entry exists.' });
+      }
       console.error('Error saving operator selection:', error);
       return res.status(500).json({ message: 'Error saving operator selection.', error: error.message });
     } finally {
@@ -321,6 +367,7 @@ app.post('/add_operator', async (req, res) => {
     }
   });
   
+
   
   app.get('/get_operator_selections', async (req, res) => {
     const client = new MongoClient(mongoURI, { connectTimeoutMS: 600000 });
