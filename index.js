@@ -388,6 +388,44 @@ app.post('/add_operator', async (req, res) => {
     } 
   });
  
+  app.get('/operatorwise_data',async(req,res) => {
+    const client = new MongoClient(mongoURI, { connectTimeoutMS: 600000 });
+    
+    try {
+      // Connect to the MongoDB client
+      await client.connect();
+      const db = client.db(dbName);
+      const collection = db.collection('operatorwise_data'); // Use your collection name
+  
+      // Fetch all documents from the collection
+      const data = await collection.find().toArray();
+  
+      return res.status(200).json({ data });
+    } catch (error) {
+      console.error('Error fetching data: ' + error.message);
+      return res.status(500).json({ message: 'Error fetching data', error: error.message });
+    } 
+  })
+
+
+  app.get('/breakwise_data',async(req,res) => {
+    const client = new MongoClient(mongoURI, { connectTimeoutMS: 600000 });
+    
+    try {
+      // Connect to the MongoDB client
+      await client.connect();
+      const db = client.db(dbName);
+      const collection = db.collection('breakwise_data'); // Use your collection name
+  
+      // Fetch all documents from the collection
+      const data = await collection.find().toArray();
+      console.log(data);
+      return res.status(200).json({ data });
+    } catch (error) {
+      console.error('Error fetching data: ' + error.message);
+      return res.status(500).json({ message: 'Error fetching data', error: error.message });
+    } 
+  })
 
   app.delete('/delete_operator/:id', async (req, res) => {
     const reasonId = req.params.id; // Get the reason ID from the request params
